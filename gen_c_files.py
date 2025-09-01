@@ -1,6 +1,20 @@
 import os
+import sys
 
-NUM_FILES = int(os.environ.get("ITER", 50))
+def get_num_files():
+    # Try command-line argument first
+    if len(sys.argv) > 1:
+        try:
+            return int(sys.argv[1])
+        except Exception:
+            pass
+    # Then environment variable
+    try:
+        return int(os.environ.get("ITER", 100))
+    except Exception:
+        return 100
+
+NUM_FILES = get_num_files()
 BASE_DIR = "generated"
 
 os.makedirs(BASE_DIR, exist_ok=True)

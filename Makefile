@@ -5,10 +5,35 @@
 #   make clean      # remove build artifacts
 
 # Use ITER for number of modules, default to 50
-ITER ?= 50
+ITER ?= 500
 NUM_FILES = $(ITER)
 BASE_DIR = generated
-PYTHON = python
+
+uname:=$(shell uname)
+
+ifeq ($(uname),Linux)
+	OS := linux
+else ifeq ($(findstring CYGWIN,$(uname)),CYGWIN)
+	OS := cygwin
+else ifeq ($(findstring MINGW,$(uname)),MINGW)
+	OS := mingw
+else ifeq ($(findstring MSYS,$(uname)),MSYS)
+	OS := msys
+else
+	OS := windows
+endif
+
+ifeq ($(OS),cygwin)
+	ROOT=/cygdrive/c
+else ifeq ($(OS),mingw)
+	ROOT=C:
+else ifeq ($(OS),windows)
+	ROOT=C:
+endif
+
+PYTHON3=$(ROOT)/T2P_Tools/Python/3.13.2-01/python.exe
+CC = $(ROOT)/ems2/T2P_Tools/ti-arm-clang/3.2.0/bin/tiarmclang.exe
+
 
 # List of folders
 FOLDERS = $(addprefix $(BASE_DIR)/mod_,$(shell seq -w 001 $(ITER)))
@@ -31,8 +56,22 @@ CFLAGS += -Igenerated
 INCLUDE_DIRS = $(addprefix -I$(BASE_DIR)/mod_,$(shell seq -w 001 $(ITER)))
 CFLAGS += -I$(BASE_DIR) $(INCLUDE_DIRS)
 
+# TI ARM Clang specific flags for bare-metal target
+CFLAGS += -mcpu=cortex-m4 -mthumb
+LDFLAGS += -Xlinker --output_file=$(EXEC:.exe=.out) -Xlinker --map_file=$(EXEC:.exe=.map) -Xlinker --rom_model
+
 all: generate
-	@start=$$(date +%s%3N); \
+ifeq ($(OS),windows)
+	REM Windows cmd timing (no millisecond precision)
+	for /f %%t in ('echo %time%') do set START=%%t
+	$(MAKE) build_only
+	for /f %%t in ('echo %time%') do set END=%%t
+	echo Build complete.
+	echo Command: make all $(MAKEFLAGS)
+	echo Build time: (timing not implemented for cmd)
+	ver
+else
+	start=$$(date +%s%3N); \
 	$(MAKE) build_only; \
 	end=$$(date +%s%3N); \
 	delta=$$(awk "BEGIN {print ($$end-$$start)/1000}"); \
@@ -40,15 +79,20 @@ all: generate
 	echo "Command: make all $(MAKEFLAGS)"; \
 	echo "Build time: $$delta seconds"; \
 	(echo "System info:" && (uname -a 2>/dev/null || ver))
+endif
 
 .PHONY: build_only
 build_only: generate $(OBJS) $(EXEC)
 
 $(EXEC): $(OBJS) $(MAIN)
-	$(CC) $(CFLAGS) $(OBJS) $(MAIN) -o $(EXEC)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(MAIN) -o $(EXEC)
 
 generate:
-	ITER=$(ITER) $(PYTHON) gen_c_files.py
+ifeq ($(OS),windows)
+	set ITER=$(ITER) && $(PYTHON3) gen_c_files.py
+else
+	ITER=$(ITER) $(PYTHON3) gen_c_files.py
+endif
 
 $(BASE_DIR)/mod_%/mod_%.o: $(BASE_DIR)/mod_%/mod_%.c $(BASE_DIR)/mod_%/mod_%.h
 	$(CC) $(CFLAGS) -c $< -o $@

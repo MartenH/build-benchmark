@@ -1,14 +1,24 @@
 # build-benchmark
 
 
-
-Command: make all  -- ITER=100
-Build time: 20.48 seconds
+```
+Command: make all  -j
+Build time: 47.594 seconds
 System info:
-MINGW64_NT-10.0-26100 LENOVO-MAHI 3.5.4-0bc1222b.x86_64 2024-12-05 09:27 UTC x86_64 Msys
+MINGW64_NT-10.0-22631 SEGOTW8RWMC64 3.6.3-1f8def9f.x86_64 2025-06-18 07:19 UTC x86_64 Msys
+```
 
+```
+Command: make all  -j
+Build time: 48.029 seconds
+System info:
+CYGWIN_NT-10.0 SEGOTW8RWMC64 3.1.5(0.340/5/3) 2020-06-01 08:59 x86_64 Cygwin
+```
+```
+make[1]: Leaving directory '/d/ems2/build-benchmark'
+Build complete.
 Command: make all  -j -- ITER=100
-Build time: 4.733 seconds
+Build time: 3.616 seconds
 System info:
-MINGW64_NT-10.0-26100 LENOVO-MAHI 3.5.4-0bc1222b.x86_64 2024-12-05 09:27 UTC x86_64 Msys
-
+MINGW64_NT-10.0-22631 SEGOTW8RWMC64 3.6.3-1f8def9f.x86_64 2025-06-18 07:19 UTC x86_64 Msys
+```
