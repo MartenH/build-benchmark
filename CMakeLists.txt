@@ -1,11 +1,16 @@
 
 cmake_minimum_required(VERSION 3.15)
 
+# Set tool paths - can be overridden from command line
+# Default to Windows-style paths (CMake is a Windows executable)
+set(PYTHON_EXE "C:/T2P_Tools/Python/3.13.2-01/python.exe" CACHE FILEPATH "Python executable path")
+set(TI_COMPILER_PATH "C:/ems2/T2P_Tools/ti-arm-clang/3.2.0/bin/tiarmclang.exe" CACHE FILEPATH "TI ARM Clang compiler path")
+
 # Set cross-compiler explicitly (TI ARM Clang)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
-set(CMAKE_C_COMPILER "/c/ems2/T2P_Tools/ti-arm-clang/3.2.0/bin/tiarmclang.exe" CACHE FILEPATH "C Compiler" FORCE)
-set(CMAKE_CXX_COMPILER "/c/ems2/T2P_Tools/ti-arm-clang/3.2.0/bin/tiarmclang.exe" CACHE FILEPATH "CXX Compiler" FORCE)
+set(CMAKE_C_COMPILER ${TI_COMPILER_PATH} CACHE FILEPATH "C Compiler" FORCE)
+set(CMAKE_CXX_COMPILER ${TI_COMPILER_PATH} CACHE FILEPATH "CXX Compiler" FORCE)
 
 # Don't try to test the compiler (cross-compilation)
 set(CMAKE_C_COMPILER_WORKS 1)
@@ -19,9 +24,6 @@ project(build-benchmark C)
 
 # Allow override of ITER from command line: -DITER=100
 set(ITER 500 CACHE STRING "Number of modules to generate")
-
-# Python executable (use MSYS2-style path)
-set(PYTHON_EXE "/c/T2P_Tools/Python/3.13.2-01/python.exe")
 
 # Generate files
 add_custom_command(
