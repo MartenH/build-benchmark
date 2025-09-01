@@ -1,6 +1,12 @@
 
 cmake_minimum_required(VERSION 3.15)
 
+# Handle Cygwin environment to ensure Windows tools work properly
+if(CYGWIN)
+    # Force Windows-style behavior when using Windows tools from Cygwin
+    set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+endif()
+
 # Set tool paths - can be overridden from command line
 # Default to Windows-style paths (CMake is a Windows executable)
 set(PYTHON_EXE "C:/T2P_Tools/Python/3.13.2-01/python.exe" CACHE FILEPATH "Python executable path")
@@ -11,6 +17,9 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_C_COMPILER ${TI_COMPILER_PATH} CACHE FILEPATH "C Compiler" FORCE)
 set(CMAKE_CXX_COMPILER ${TI_COMPILER_PATH} CACHE FILEPATH "CXX Compiler" FORCE)
+
+# TI ARM Clang specific linker flags
+set(CMAKE_EXE_LINKER_FLAGS "-Xlinker --output_file=test_app.out -Xlinker --map_file=test_app.map -Xlinker --rom_model" CACHE STRING "TI ARM Clang linker flags")
 
 # Don't try to test the compiler (cross-compilation)
 set(CMAKE_C_COMPILER_WORKS 1)

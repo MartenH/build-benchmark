@@ -42,6 +42,8 @@ CFILES = $(foreach i,$(shell seq -w 001 $(ITER)),$(BASE_DIR)/mod_$(i)/mod_$(i).c
 HFILES = $(foreach i,$(shell seq -w 001 $(ITER)),$(BASE_DIR)/mod_$(i)/mod_$(i).h)
 # List of object files
 OBJS = $(CFILES:.c=.o)
+# List of dependency files
+DEPFILES = $(OBJS:.o=.o.d)
 
 .PHONY: all generate clean test
 
@@ -58,6 +60,10 @@ CFLAGS += -I$(BASE_DIR) $(INCLUDE_DIRS)
 
 # TI ARM Clang specific flags for bare-metal target
 CFLAGS += -mcpu=cortex-m4 -mthumb
+
+# Add dependency generation flags (like CMake does)
+CFLAGS += -MD -MT $@ -MF $@.d
+
 LDFLAGS += -Xlinker --output_file=$(EXEC:.exe=.out) -Xlinker --map_file=$(EXEC:.exe=.map) -Xlinker --rom_model
 
 all: generate
@@ -101,7 +107,12 @@ clean:
 	rm -rf $(BASE_DIR)
 	rm -f *.o
 	rm -f *.exe
+	rm -f *.out
+	rm -f *.map
 
 # test target runs the executable
 test: $(EXEC)
 	./$(EXEC)
+
+# Include dependency files (if they exist)
+-include $(DEPFILES)

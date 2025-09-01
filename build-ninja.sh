@@ -72,7 +72,7 @@ fi
 # Time the actual build
 echo "Starting timed build..."
 start_time=$(date +%s.%3N)
-"${CMAKE_EXE}" --build . --parallel
+"${CMAKE_EXE}" --build . --parallel --verbose
 end_time=$(date +%s.%3N)
 
 # Calculate elapsed time
